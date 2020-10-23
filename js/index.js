@@ -1,28 +1,33 @@
-const BACKEND_URL = 'http://localhost:3000/api/series/list';
+const BACKEND_URL   = 'http://localhost:3000/api/series/list';
 const urlImgPrefix  = 'https://image.tmdb.org/t/p/w500';
 
-const xhr = new XMLHttpRequest();
-xhr.open('GET', BACKEND_URL);
-xhr.send(null);
+const loadSeries = () => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', BACKEND_URL);
+        xhr.send(null);
 
-xhr.addEventListener('load', () => {
-    if(xhr.status >= 200 && xhr.status < 300) {
-        const tvShows = JSON.parse(xhr.response).results;
+        xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const response = JSON.parse(xhr.response);
+                const tvShows = response.results;
+                console.log(JSON.parse(xhr.response));
+                
+                const slides = tvShows.map(show => {
+                    return { src: urlImgPrefix + show.poster_path, txt: `<h5>${show.name}</h5><p>${show.overview}</p>` }
+                });
 
-        const slides = tvShows.map(show => {
-            return {src: show.poster_path, txt: show.overview}
+                console.log(slides);
+                new Slider(slides, '.my-slider', 20);
+
+
+            } else {
+                console.log('Une erreur est survenue. Statut de la requête : ' + xhr.status);
+            }
         });
 
-       new Slider('.my-slider', slides, 10);
-
-    } else {
-        console.log('Une erreur est survenue. Statut de la requête : ' + xhr.status);
-    }
-});
-
-xhr.addEventListener('error', e => {
-    console.log('Une erreur est survenue. Contenu de l\'erreur : ', e)
-});
+        xhr.addEventListener('error', e => { console.log(e); });
+}
 
 
+loadSeries();
 
